@@ -1,0 +1,1981 @@
+<!DOCTYPE html>
+<html lang="ko" data-fontsize="large" data-cols="1">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>주누 마이링크 - 내 손안의 큰글씨 즐겨찾기</title>
+    <meta name="description" content="자주 가는 사이트를 큰 글씨로 모아 터치 한 번에 여는 나만의 개인 즐겨찾기 앱 (주누디자인 무료 제공)">
+
+    <!-- 오픈그래프 (카톡 공유 시 미리보기) -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="주누 마이링크 - 내 손안의 큰글씨 즐겨찾기">
+    <meta property="og:description" content="복잡한 즐겨찾기는 끝! 자주 가는 사이트를 내 폰 바탕화면에서 큰 글씨로 한 번에 여세요.">
+    <meta property="og:image" content="https://joonoodesign.github.io/my-link/icon-512.png">
+
+    <!-- PWA 모바일 앱 설정 -->
+    <link rel="manifest" href="manifest.json?v=100">
+    <meta name="theme-color" content="#0B192C">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="주누 마이링크">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="icon-192.png">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <style>
+        /* =========================================================
+           1. 색상 테마 (라이트/다크 모두 고대비 가독성 보장)
+           ========================================================= */
+        :root {
+            --bg-color: #f1f5f9;
+            --surface-bg: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: #cbd5e1;
+            --text-color: #0f172a;
+            --text-sub: #334155;
+            --text-muted: #64748b;
+            --chip-bg: #ffffff;
+            --chip-text: #1e293b;
+            --primary-gradient: linear-gradient(135deg, #0B192C 0%, #1B3B66 100%);
+            --accent-primary: #1D4ED8;
+            --accent-gold-bg: linear-gradient(135deg, #FFD700 0%, #F5B700 100%);
+            --shadow: rgba(15, 23, 42, 0.07);
+            --border-color: #cbd5e1;
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 16px);
+            --safe-left: env(safe-area-inset-left, 0px);
+            --safe-right: env(safe-area-inset-right, 0px);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0b0d13;
+            --surface-bg: #151924;
+            --card-bg: #1b202e;
+            --card-border: rgba(255, 255, 255, 0.18);
+            --text-color: #ffffff;
+            --text-sub: #d0d7e6;
+            --text-muted: #9aa4b8;
+            --chip-bg: #1f2536;
+            --chip-text: #eef2f9;
+            --primary-gradient: linear-gradient(135deg, #0B192C 0%, #1E3E62 100%);
+            --accent-primary: #3B82F6;
+            --shadow: rgba(0, 0, 0, 0.45);
+            --border-color: #32394e;
+        }
+
+        /* =========================================================
+           2. 3단계 글자 크기 스케일 (보통 / 크게[기본] / 특대)
+           ========================================================= */
+        html[data-fontsize="normal"] {
+            --fs-header: 19px;
+            --fs-sub: 13px;
+            --fs-hbtn: 15px;
+            --fs-search: 18px;
+            --fs-chip: 17px;
+            --fs-section: 19px;
+            --fs-card: 19px;
+            --fs-domain: 13px;
+            --h-search: 50px;
+            --h-card: 66px;
+        }
+
+        html[data-fontsize="large"] {
+            --fs-header: 22px;
+            --fs-sub: 14px;
+            --fs-hbtn: 16px;
+            --fs-search: 20px;
+            --fs-chip: 19px;
+            --fs-section: 22px;
+            --fs-card: 22px;
+            --fs-domain: 14px;
+            --h-search: 56px;
+            --h-card: 74px;
+        }
+
+        html[data-fontsize="xlarge"] {
+            --fs-header: 24px;
+            --fs-sub: 15px;
+            --fs-hbtn: 17px;
+            --fs-search: 23px;
+            --fs-chip: 21px;
+            --fs-section: 24px;
+            --fs-card: 26px;
+            --fs-domain: 16px;
+            --h-search: 62px;
+            --h-card: 84px;
+        }
+
+        /* =========================================================
+           3. 가로폭 초과(자동 축소 버그) 100% 원천 차단
+           ========================================================= */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            padding-top: calc(var(--safe-top) + 10px);
+            padding-bottom: calc(var(--safe-bottom) + 32px);
+            padding-left: calc(var(--safe-left) + 12px);
+            padding-right: calc(var(--safe-right) + 12px);
+            min-height: 100dvh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1120px;
+            margin: 0 auto;
+        }
+
+        /* =========================================================
+           4. 상단 브랜드 헤더 (공식 JD 로고 엠블럼 탑재)
+           ========================================================= */
+        .top-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .header-banner {
+            background: var(--primary-gradient);
+            color: #ffffff;
+            padding: 13px 14px;
+            border-radius: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 6px 20px rgba(11, 25, 44, 0.22);
+            width: 100%;
+        }
+
+        .brand-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .brand-logo-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 11px;
+            background: #ffffff;
+            padding: 2px;
+            flex-shrink: 0;
+            object-fit: contain;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        .header-title-box {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .header-banner h1 {
+            margin: 0;
+            font-size: var(--fs-header);
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .header-subtitle {
+            margin: 2px 0 0 0;
+            font-size: var(--fs-sub);
+            color: rgba(255, 255, 255, 0.88);
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+            align-items: center;
+        }
+
+        .header-btn {
+            background-color: rgba(255, 255, 255, 0.18);
+            color: #ffffff;
+            border: 1.5px solid rgba(255, 255, 255, 0.35);
+            padding: 9px 11px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: var(--fs-hbtn);
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .header-btn:active {
+            transform: scale(0.95);
+            background-color: rgba(255, 255, 255, 0.32);
+        }
+
+        .header-btn.active-mode {
+            background: var(--accent-gold-bg);
+            color: #000000;
+            border-color: #FFD700;
+        }
+
+        /* 앱 설치 유도 배너 */
+        .install-banner {
+            display: none;
+            width: 100%;
+            background: var(--accent-gold-bg);
+            color: #000000;
+            border: none;
+            border-radius: 14px;
+            padding: 13px 16px;
+            font-family: inherit;
+            font-size: 18px;
+            font-weight: 900;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(245, 183, 0, 0.35);
+        }
+
+        /* =========================================================
+           5. 검색창 + 빠른 액션 바 (내 사이트 추가 / 편집)
+           ========================================================= */
+        .search-box {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+            height: var(--h-search);
+            padding: 0 48px 0 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            font-size: var(--fs-search);
+            font-weight: 800;
+            font-family: inherit;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            box-shadow: 0 3px 10px var(--shadow);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.22);
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(100, 116, 139, 0.22);
+            border: none;
+            color: var(--text-color);
+            font-size: 18px;
+            font-weight: 900;
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 초보자용 직관적 상단 버튼 줄 */
+        .quick-bar {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .btn-open-add {
+            background: #1D4ED8;
+            color: #ffffff;
+            border: none;
+            border-radius: 14px;
+            padding: 12px 14px;
+            font-family: inherit;
+            font-size: 18px;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25);
+        }
+
+        .btn-open-add:active {
+            transform: scale(0.98);
+        }
+
+        .btn-quick-edit {
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            padding: 12px 14px;
+            font-family: inherit;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        body.edit-mode .btn-quick-edit {
+            background: var(--accent-gold-bg);
+            color: #000000;
+            border-color: #F5B700;
+        }
+
+        /* =========================================================
+           6. 카테고리 칩
+           ========================================================= */
+        .category-nav {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            overflow-x: auto;
+            padding: 2px 0 10px 0;
+            margin-bottom: 6px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .category-nav::-webkit-scrollbar { display: none; }
+
+        .cat-chip {
+            padding: 11px 17px;
+            border-radius: 24px;
+            font-family: inherit;
+            font-size: var(--fs-chip);
+            font-weight: 800;
+            white-space: nowrap;
+            background-color: var(--chip-bg);
+            border: 2px solid var(--border-color);
+            color: var(--chip-text);
+            cursor: pointer;
+            flex-shrink: 0;
+            line-height: 1.2;
+        }
+
+        .cat-chip.active {
+            background: #0B192C;
+            color: #FFD700;
+            border-color: #0B192C;
+            font-weight: 900;
+            box-shadow: 0 3px 10px rgba(11, 25, 44, 0.25);
+        }
+
+        [data-theme="dark"] .cat-chip.active {
+            background: var(--accent-gold-bg);
+            color: #000000;
+            border-color: #FFD700;
+        }
+
+        /* =========================================================
+           7. 내 즐겨찾기 추가/수정 폼
+           ========================================================= */
+        .add-form {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 18px;
+            background-color: var(--card-bg);
+            padding: 16px;
+            border-radius: 18px;
+            border: 2.5px solid #1D4ED8;
+            box-shadow: 0 8px 24px var(--shadow);
+        }
+
+        .add-form.open { display: flex; }
+
+        .form-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-head strong {
+            font-size: 19px;
+            font-weight: 900;
+        }
+
+        .form-close-btn {
+            background: transparent;
+            border: 1.5px solid var(--border-color);
+            color: var(--text-sub);
+            border-radius: 10px;
+            padding: 6px 12px;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .add-form input, .add-form select {
+            padding: 13px 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            flex: 1;
+            min-width: 0;
+            width: 100%;
+            font-size: 18px;
+            font-weight: 700;
+            font-family: inherit;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            outline: none;
+        }
+
+        .helper-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .btn-helper {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            padding: 11px 10px;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .add-btn {
+            background: #1D4ED8;
+            color: #ffffff;
+            border: none;
+            padding: 15px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 900;
+            font-size: 20px;
+        }
+
+        /* =========================================================
+           8. 링크 카드 그리드
+           ========================================================= */
+        .section-title {
+            font-size: var(--fs-section);
+            margin: 18px 0 10px 2px;
+            color: var(--text-color);
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 18px;
+            width: 100%;
+        }
+
+        html[data-cols="2"] .button-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        @media (min-width: 680px) {
+            .button-grid,
+            html[data-cols="2"] .button-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+            }
+        }
+
+        @media (min-width: 960px) {
+            html[data-fontsize="large"] {
+                --fs-card: 19px;
+                --h-card: 66px;
+            }
+            .button-grid,
+            html[data-cols="2"] .button-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 12px;
+            }
+        }
+
+        /* 가로 회전(Landscape) 슬림화 & 다단 확장 */
+        @media screen and (orientation: landscape) and (max-height: 560px) {
+            .top-area {
+                flex-direction: row;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 8px;
+            }
+            .header-banner {
+                flex: 0 0 auto;
+                width: auto;
+                padding: 9px 12px;
+            }
+            .header-subtitle {
+                display: none;
+            }
+            .search-box {
+                flex: 1;
+            }
+            .search-input {
+                height: 48px;
+            }
+            .button-grid,
+            html[data-cols="2"] .button-grid {
+                grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+                gap: 10px;
+            }
+        }
+
+        body.wide-grid-mode .button-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .link-wrapper {
+            position: relative;
+            min-width: 0;
+            width: 100%;
+        }
+
+        .link-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            background-color: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 16px;
+            min-height: var(--h-card);
+            padding: 12px 12px 12px 16px;
+            box-shadow: 0 3px 10px var(--shadow);
+            width: 100%;
+            min-width: 0;
+        }
+
+        .link-card:active {
+            transform: scale(0.985);
+            border-color: var(--accent-primary);
+        }
+
+        .link-anchor {
+            flex: 1;
+            min-width: 0;
+            text-decoration: none;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 2px 0;
+        }
+
+        .link-title {
+            font-size: var(--fs-card);
+            font-weight: 900;
+            line-height: 1.3;
+            letter-spacing: -0.3px;
+            word-break: keep-all;
+            overflow-wrap: anywhere;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .link-url-preview {
+            font-size: var(--fs-domain);
+            color: var(--text-muted);
+            margin-top: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 600;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+            align-items: center;
+        }
+
+        .icon-action-btn {
+            background: var(--bg-color);
+            color: var(--text-sub);
+            border: 1.5px solid var(--border-color);
+            border-radius: 11px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 17px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .icon-action-btn:active {
+            transform: scale(0.9);
+            background: #FFD700;
+            color: #000000;
+        }
+
+        /* 편집 모드 시 일반 복사/공유 대신 [▲ 이동] [✏️ 수정] [× 삭제] 버튼 표시 */
+        .edit-controls {
+            display: none;
+            gap: 5px;
+            flex-shrink: 0;
+            align-items: center;
+        }
+
+        body.edit-mode .normal-controls { display: none; }
+        body.edit-mode .edit-controls { display: flex; }
+
+        .edit-mini-btn {
+            border-radius: 10px;
+            border: 1.5px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-color);
+            width: 36px;
+            height: 36px;
+            font-size: 15px;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .edit-mini-btn.danger {
+            background: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
+        }
+
+        @media (max-width: 679px) {
+            html[data-cols="2"] .share-btn,
+            body.wide-grid-mode .share-btn {
+                display: none;
+            }
+            html[data-cols="2"] .link-card,
+            body.wide-grid-mode .link-card {
+                padding: 10px 8px 10px 12px;
+            }
+            html[data-cols="2"] .link-title,
+            body.wide-grid-mode .link-title {
+                font-size: calc(var(--fs-card) - 3px);
+            }
+            html[data-cols="2"] .icon-action-btn,
+            body.wide-grid-mode .icon-action-btn {
+                width: 34px;
+                height: 34px;
+                font-size: 15px;
+            }
+        }
+
+        /* 카테고리 좌측 컬러 바 */
+        .cat-daily { border-left: 6px solid #F59E0B; }
+        .cat-shop { border-left: 6px solid #10B981; }
+        .cat-work { border-left: 6px solid #2563EB; }
+        .cat-media { border-left: 6px solid #EC4899; }
+
+        .empty-msg {
+            text-align: center;
+            color: var(--text-muted);
+            font-weight: 700;
+            padding: 28px 16px;
+            font-size: 18px;
+            grid-column: 1 / -1;
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1.5px dashed var(--border-color);
+        }
+
+        /* =========================================================
+           9. 주누디자인 공식 브랜드 명함 배너 (자사몰 연결 & 앱 추천)
+           ========================================================= */
+        .promo-card {
+            margin-top: 28px;
+            background: #ffffff;
+            color: #0f172a;
+            border: 2px solid #cbd5e1;
+            border-radius: 20px;
+            padding: 20px 18px;
+            box-shadow: 0 6px 20px var(--shadow);
+            text-align: center;
+        }
+
+        .promo-logo {
+            height: 44px;
+            max-width: 240px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto 10px auto;
+        }
+
+        .promo-desc {
+            margin: 0 0 14px 0;
+            font-size: 16px;
+            font-weight: 800;
+            color: #334155;
+            line-height: 1.45;
+            word-break: keep-all;
+        }
+
+        .promo-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        @media (min-width: 560px) {
+            .promo-actions {
+                grid-template-columns: 1.2fr 1fr;
+            }
+        }
+
+        .btn-mall {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            background: var(--primary-gradient);
+            color: #ffffff;
+            padding: 14px 16px;
+            border-radius: 14px;
+            font-size: 18px;
+            font-weight: 900;
+            box-shadow: 0 4px 12px rgba(11, 25, 44, 0.25);
+        }
+
+        .btn-share-app {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: #FEF3C7;
+            color: #78350F;
+            border: 1.5px solid #F59E0B;
+            padding: 13px 16px;
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 17px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .footer-note {
+            margin-top: 14px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+        /* =========================================================
+           10. ⚙️ 설정 바텀 시트
+           ========================================================= */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(3px);
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 1000;
+            padding: 12px;
+        }
+
+        .modal-backdrop.open { display: flex; }
+
+        .settings-sheet {
+            width: 100%;
+            max-width: 520px;
+            background: var(--surface-bg);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            border-radius: 24px;
+            padding: 20px;
+            padding-bottom: calc(var(--safe-bottom) + 16px);
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.45);
+            max-height: 90dvh;
+            overflow-y: auto;
+        }
+
+        .sheet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .sheet-header h3 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .sheet-close {
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px 14px;
+            font-family: inherit;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .setting-group { margin-bottom: 16px; }
+
+        .setting-label {
+            display: block;
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+        }
+
+        .segmented-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+            gap: 8px;
+        }
+
+        .seg-btn {
+            padding: 13px 10px;
+            border-radius: 14px;
+            border: 2px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .seg-btn.selected {
+            background: #0B192C;
+            color: #FFD700;
+            border-color: #0B192C;
+            font-weight: 900;
+        }
+
+        [data-theme="dark"] .seg-btn.selected {
+            background: var(--accent-gold-bg);
+            color: #000000;
+            border-color: #FFD700;
+        }
+
+        .full-action-btn {
+            width: 100%;
+            padding: 13px;
+            border-radius: 14px;
+            border: 2px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* 토스트 알림 */
+        .toast {
+            position: fixed;
+            bottom: calc(var(--safe-bottom) + 24px);
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #0B192C;
+            color: #FFD700;
+            border: 1.5px solid #FFD700;
+            padding: 13px 22px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 900;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            z-index: 2000;
+            max-width: calc(100vw - 32px);
+            text-align: center;
+            word-break: keep-all;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 상단 브랜드 헤더 & 검색 -->
+        <div class="top-area">
+            <header class="header-banner">
+                <div class="brand-left">
+                    <img src="icon-192.png" alt="주누디자인 로고" class="brand-logo-icon">
+                    <div class="header-title-box">
+                        <h1>주누 마이링크</h1>
+                        <p class="header-subtitle">내 폰에 저장되는 큰글씨 즐겨찾기</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button type="button" id="btnRotate" class="header-btn" onclick="toggleLandscape()">🔄 가로</button>
+                    <button type="button" id="btnSettings" class="header-btn" onclick="openSettings()">⚙️ 설정</button>
+                </div>
+            </header>
+
+            <button type="button" id="btnInstall" class="install-banner" onclick="installApp()">
+                📲 스마트폰 바탕화면에 앱으로 설치하기
+            </button>
+
+            <div class="search-box">
+                <input type="search" id="searchInput" class="search-input" placeholder="🔍 이름·초성 검색 (예: ㄴㅇㅂ, ㅌㅂ)" oninput="handleSearch(this.value)" autocomplete="off">
+                <button type="button" id="searchClear" class="search-clear" onclick="clearSearch()" aria-label="검색어 지우기">✕</button>
+            </div>
+        </div>
+
+        <!-- 직관적인 추가 & 편집 버튼 바 -->
+        <div class="quick-bar">
+            <button type="button" class="btn-open-add" onclick="openAddForm()">➕ 내 즐겨찾기 추가</button>
+            <button type="button" id="btnEditToggle" class="btn-quick-edit" onclick="toggleEditMode()">✏️ 편집</button>
+        </div>
+
+        <!-- 카테고리 선택 칩 -->
+        <nav class="category-nav" aria-label="카테고리 선택">
+            <button type="button" class="cat-chip active" onclick="filterCategory('all', this)">전체보기</button>
+            <button type="button" class="cat-chip" onclick="filterCategory('daily', this)">🌟 매일 가는 곳</button>
+            <button type="button" class="cat-chip" onclick="filterCategory('shop', this)">🛒 쇼핑·생활</button>
+            <button type="button" class="cat-chip" onclick="filterCategory('work', this)">🏦 금융·공공·업무</button>
+            <button type="button" class="cat-chip" onclick="filterCategory('media', this)">🎬 뉴스·유튜브</button>
+        </nav>
+
+        <!-- 사이트 추가 / 수정 폼 -->
+        <div class="add-form" id="addForm">
+            <div class="form-head">
+                <strong id="formTitle">➕ 새 즐겨찾기 등록</strong>
+                <button type="button" class="form-close-btn" onclick="closeAddForm()">닫기 ✕</button>
+            </div>
+            <input type="hidden" id="editingId" value="">
+            <div class="helper-row">
+                <button type="button" class="btn-helper" onclick="pasteClipboardUrl()">📋 복사한 주소 붙여넣기</button>
+                <button type="button" class="btn-helper" onclick="smartSuggestName(document.getElementById('inputUrl').value)">🤖 이름 자동입력</button>
+            </div>
+            <div class="form-row">
+                <input type="url" id="inputUrl" placeholder="사이트 주소 (예: naver.com 또는 https://...)" onchange="smartSuggestName(this.value)">
+            </div>
+            <div class="form-row">
+                <input type="text" id="inputName" placeholder="버튼 이름 (예: 우리은행, 내 블로그)">
+                <select id="inputCategory">
+                    <option value="daily">🌟 매일 가는 곳</option>
+                    <option value="shop">🛒 쇼핑·생활</option>
+                    <option value="work">🏦 금융·공공·업무</option>
+                    <option value="media">🎬 뉴스·유튜브</option>
+                </select>
+            </div>
+            <button type="button" id="btnSaveLink" class="add-btn" onclick="saveLink()">내 폰에 저장하기 ✓</button>
+        </div>
+
+        <!-- 4대 카테고리 섹션 -->
+        <section id="section-daily" class="cat-section">
+            <h2 class="section-title">🌟 매일 가는 곳</h2>
+            <div class="button-grid" id="grid-daily"></div>
+        </section>
+
+        <section id="section-shop" class="cat-section">
+            <h2 class="section-title">🛒 쇼핑·생활</h2>
+            <div class="button-grid" id="grid-shop"></div>
+        </section>
+
+        <section id="section-work" class="cat-section">
+            <h2 class="section-title">🏦 금융·공공·업무</h2>
+            <div class="button-grid" id="grid-work"></div>
+        </section>
+
+        <section id="section-media" class="cat-section">
+            <h2 class="section-title">🎬 뉴스·유튜브</h2>
+            <div class="button-grid" id="grid-media"></div>
+        </section>
+
+        <!-- 주누디자인 공식 자사몰 브랜드 배너 & 지인 공유 -->
+        <aside class="promo-card" aria-label="주누디자인 공식 안내">
+            <img src="logo-horizontal.png" alt="주누디자인 공식 로고" class="promo-logo">
+            <p class="promo-desc">
+                명함 · 스티커 · 전단지 · 봉투 · 양식지 맞춤 제작<br>
+                고품질 인쇄가 필요할 땐 <strong>주누디자인</strong>과 함께하세요!
+            </p>
+            <div class="promo-actions">
+                <a href="https://joonoo.co.kr/" target="_blank" rel="noopener noreferrer" class="btn-mall" onclick="triggerHaptic(20)">
+                    🎨 주누디자인 공식몰 바로가기
+                </a>
+                <button type="button" class="btn-share-app" onclick="shareThisApp()">
+                    💌 지인에게 이 앱 추천하기
+                </button>
+            </div>
+        </aside>
+
+        <footer class="footer-note">
+            🔒 등록하신 즐겨찾기는 내 스마트폰 안에만 안전하게 보관되며,<br>
+            폰을 바꿀 땐 <strong>[⚙️ 설정 → 카톡 '나에게' 이사 링크 보내기]</strong>로 1초 만에 옮길 수 있습니다. (<span id="linkCount">0개 보관 중</span>)
+        </footer>
+    </div>
+
+    <!-- ⚙️ 화면 설정 및 백업 모달 -->
+    <div id="settingsModal" class="modal-backdrop" onclick="handleBackdropClick(event)">
+        <div class="settings-sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+            <div class="sheet-header">
+                <h3 id="sheetTitle">⚙️ 화면 설정 및 백업</h3>
+                <button type="button" class="sheet-close" onclick="closeSettings()">닫기 ✕</button>
+            </div>
+
+            <div class="setting-group">
+                <span class="setting-label">1. 글씨 크기 조절</span>
+                <div class="segmented-row">
+                    <button type="button" class="seg-btn" data-fs-opt="normal" onclick="setFontSize('normal')">보통</button>
+                    <button type="button" class="seg-btn selected" data-fs-opt="large" onclick="setFontSize('large')">크게 (기본)</button>
+                    <button type="button" class="seg-btn" data-fs-opt="xlarge" onclick="setFontSize('xlarge')">특대 (돋보기)</button>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <span class="setting-label">2. 세로 화면 카드 배치</span>
+                <div class="segmented-row">
+                    <button type="button" class="seg-btn selected" data-col-opt="1" onclick="setColumns('1')">1열 시원하게</button>
+                    <button type="button" class="seg-btn" data-col-opt="2" onclick="setColumns('2')">2열 모아보기</button>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <span class="setting-label">3. 배경 색상 테마</span>
+                <div class="segmented-row">
+                    <button type="button" class="seg-btn selected" data-theme-opt="light" onclick="setTheme('light')">☀️ 밝은 배경</button>
+                    <button type="button" class="seg-btn" data-theme-opt="dark" onclick="setTheme('dark')">🌙 어두운 배경</button>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <span class="setting-label">4. 휴대폰 바꿀 때 내 즐겨찾기 그대로 옮기기</span>
+                <button type="button" class="full-action-btn" style="border-color:#1D4ED8; background:rgba(29,78,216,0.08);" onclick="sendMigrationLink()">
+                    📲 카톡 '나에게' 이사 링크 보내기 (가장 쉬움!)
+                </button>
+                <button type="button" class="full-action-btn" onclick="pasteMigrationCode()">
+                    📋 복사해 둔 이사 코드·링크 붙여넣어 복원
+                </button>
+                <button type="button" class="full-action-btn" onclick="exportBackup()">
+                    💾 내 폰에 백업 파일(.json)로 다운로드
+                </button>
+                <button type="button" class="full-action-btn" onclick="document.getElementById('importFile').click()">
+                    📂 백업 파일(.json) 찾아서 불러오기
+                </button>
+                <input type="file" id="importFile" accept=".json,application/json" style="display:none;" onchange="importBackup(event)">
+                <button type="button" class="full-action-btn" onclick="resetDefaults()">
+                    🔄 처음 추천 사이트 목록으로 초기화
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script>
+        const STORAGE_KEY = "joonoo_mylink_items_v1";
+        const VALID_CATEGORIES = ["daily", "shop", "work", "media"];
+        const CHOSUNG_LIST = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+        const canNativeShare = typeof navigator.share === "function";
+
+        // 최초 설치자를 위한 국민 필수 추천 사이트 기본 세트
+        const DEFAULT_LINKS = [
+            { id: "d1", name: "네이버 (NAVER)", url: "https://m.naver.com/", category: "daily" },
+            { id: "d2", name: "유튜브 (YouTube)", url: "https://m.youtube.com/", category: "daily" },
+            { id: "d3", name: "다음 (Daum)", url: "https://m.daum.net/", category: "daily" },
+            { id: "d4", name: "오늘의 날씨 · 미세먼지", url: "https://weather.naver.com/", category: "daily" },
+            { id: "s1", name: "쿠팡 (Coupang)", url: "https://m.coupang.com/", category: "shop" },
+            { id: "s2", name: "통합 택배 배송조회", url: "https://m.search.naver.com/search.naver?query=%ED%83%9D%EB%B0%B0%EC%A1%B0%ED%9A%8C", category: "shop" },
+            { id: "s3", name: "네이버 지도 · 길찾기", url: "https://m.map.naver.com/", category: "shop" },
+            { id: "w1", name: "정부24 (민원·등본발급)", url: "https://www.gov.kr/", category: "work" },
+            { id: "w2", name: "국세청 홈택스", url: "https://hometax.go.kr/", category: "work" },
+            { id: "w3", name: "주누디자인 공식 인쇄몰", url: "https://joonoo.co.kr/", category: "work" },
+            { id: "m1", name: "네이버 실시간 주요뉴스", url: "https://news.naver.com/", category: "media" },
+            { id: "m2", name: "챗GPT (AI 비서)", url: "https://chatgpt.com/", category: "media" }
+        ];
+
+        let links = [];
+        let currentFilter = "all";
+        let deferredPrompt = null;
+        let isForcedLandscape = false;
+        let toastTimer = null;
+
+        /* =========================================================
+           1. 개인 스마트폰 로컬 데이터 불러오기 & 저장
+           ========================================================= */
+        function loadLinks() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) {
+                links = DEFAULT_LINKS.map(item => ({ ...item }));
+                persistLinks();
+            } else {
+                try {
+                    const parsed = JSON.parse(raw);
+                    links = Array.isArray(parsed) ? parsed : DEFAULT_LINKS.map(item => ({ ...item }));
+                } catch (_) {
+                    links = DEFAULT_LINKS.map(item => ({ ...item }));
+                }
+            }
+            renderLinks();
+        }
+
+        function persistLinks() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(links));
+        }
+
+        /* =========================================================
+           2. 개인화 화면 설정 (글자 크기 / 1·2열 / 테마)
+           ========================================================= */
+        function loadPreferences() {
+            const savedFs = localStorage.getItem("mylink_fs") || "large";
+            const savedCols = localStorage.getItem("mylink_cols") || "1";
+            const savedTheme = localStorage.getItem("mylink_theme") || "light";
+            applyFontSize(savedFs);
+            applyColumns(savedCols);
+            applyTheme(savedTheme);
+        }
+
+        function applyFontSize(size) {
+            const valid = ["normal", "large", "xlarge"].includes(size) ? size : "large";
+            document.documentElement.setAttribute("data-fontsize", valid);
+            document.querySelectorAll("[data-fs-opt]").forEach(btn => {
+                btn.classList.toggle("selected", btn.getAttribute("data-fs-opt") === valid);
+            });
+        }
+
+        function setFontSize(size) {
+            triggerHaptic(15);
+            localStorage.setItem("mylink_fs", size);
+            applyFontSize(size);
+            showToast(size === "xlarge" ? "🔍 특대 글씨로 변경되었습니다" : size === "large" ? "👍 크게(기본) 글씨로 변경되었습니다" : "보통 글씨로 변경되었습니다");
+        }
+
+        function applyColumns(cols) {
+            const valid = cols === "2" ? "2" : "1";
+            document.documentElement.setAttribute("data-cols", valid);
+            document.querySelectorAll("[data-col-opt]").forEach(btn => {
+                btn.classList.toggle("selected", btn.getAttribute("data-col-opt") === valid);
+            });
+        }
+
+        function setColumns(cols) {
+            triggerHaptic(15);
+            localStorage.setItem("mylink_cols", cols);
+            applyColumns(cols);
+            showToast(cols === "2" ? "📱 2열 모아보기로 전환되었습니다" : "📱 1열 시원하게 보기로 전환되었습니다");
+        }
+
+        function applyTheme(theme) {
+            const isDark = theme === "dark";
+            if (isDark) {
+                document.body.setAttribute("data-theme", "dark");
+            } else {
+                document.body.removeAttribute("data-theme");
+            }
+            document.querySelectorAll("[data-theme-opt]").forEach(btn => {
+                btn.classList.toggle("selected", btn.getAttribute("data-theme-opt") === (isDark ? "dark" : "light"));
+            });
+        }
+
+        function setTheme(theme) {
+            triggerHaptic(15);
+            localStorage.setItem("mylink_theme", theme);
+            applyTheme(theme);
+        }
+
+        /* =========================================================
+           3. 유튜브식 강제 가로/세로 전환
+           ========================================================= */
+        async function toggleLandscape() {
+            triggerHaptic(20);
+            const btn = document.getElementById("btnRotate");
+
+            if (!isForcedLandscape) {
+                try {
+                    if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+                        await document.documentElement.requestFullscreen();
+                    }
+                    if (screen.orientation && screen.orientation.lock) {
+                        await screen.orientation.lock("landscape");
+                    } else {
+                        throw new Error("LOCK_UNSUPPORTED");
+                    }
+                    isForcedLandscape = true;
+                    btn.textContent = "🔄 세로";
+                    btn.classList.add("active-mode");
+                    showToast("📱 가로 화면으로 전환되었습니다");
+                } catch (_) {
+                    isForcedLandscape = true;
+                    document.body.classList.add("wide-grid-mode");
+                    btn.textContent = "🔄 세로";
+                    btn.classList.add("active-mode");
+                    showToast("상단바 '자동 회전'을 켜고 폰을 돌리시면 전체 가로화면이 됩니다");
+                }
+            } else {
+                try {
+                    if (screen.orientation && screen.orientation.unlock) {
+                        screen.orientation.unlock();
+                    }
+                    if (document.fullscreenElement && document.exitFullscreen) {
+                        await document.exitFullscreen();
+                    }
+                } catch (_) {}
+                isForcedLandscape = false;
+                document.body.classList.remove("wide-grid-mode");
+                btn.textContent = "🔄 가로";
+                btn.classList.remove("active-mode");
+                showToast("📱 세로 화면으로 복귀했습니다");
+            }
+        }
+
+        document.addEventListener("fullscreenchange", () => {
+            if (!document.fullscreenElement && isForcedLandscape && !document.body.classList.contains("wide-grid-mode")) {
+                isForcedLandscape = false;
+                const btn = document.getElementById("btnRotate");
+                btn.textContent = "🔄 가로";
+                btn.classList.remove("active-mode");
+            }
+        });
+
+        /* =========================================================
+           4. 한글 초성 검색 & 도메인 자동 보정
+           ========================================================= */
+        function extractChosung(str) {
+            let result = "";
+            for (let i = 0; i < str.length; i++) {
+                const code = str.charCodeAt(i) - 0xAC00;
+                if (code >= 0 && code < 11172) {
+                    result += CHOSUNG_LIST[Math.floor(code / 588)];
+                } else {
+                    result += str[i];
+                }
+            }
+            return result;
+        }
+
+        function matchesQuery(nameStr, urlStr, query) {
+            if (!query) return true;
+            const lowerName = nameStr.toLowerCase().replace(/\s+/g, "");
+            const lowerQuery = query.toLowerCase().replace(/\s+/g, "");
+            if (lowerName.includes(lowerQuery) || urlStr.toLowerCase().includes(lowerQuery)) {
+                return true;
+            }
+            return extractChosung(lowerName).includes(lowerQuery);
+        }
+
+        // http:// 없이 naver.com만 쳐도 자동으로 https:// 붙여주는 친절한 보정기
+        function normalizeUrl(raw) {
+            let str = String(raw || "").trim();
+            if (!str) return null;
+            if (!/^https?:\/\//i.test(str)) {
+                str = "https://" + str;
+            }
+            try {
+                const parsed = new URL(str);
+                if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+                    return parsed.href;
+                }
+            } catch (_) {}
+            return null;
+        }
+
+        async function pasteClipboardUrl() {
+            triggerHaptic(18);
+            try {
+                const text = await navigator.clipboard.readText();
+                if (!text || !text.trim()) {
+                    showToast("복사된 주소가 없습니다. 주소창에 직접 입력해주세요.");
+                    return;
+                }
+                const urlInput = document.getElementById("inputUrl");
+                urlInput.value = text.trim();
+                smartSuggestName(text.trim());
+                showToast("📋 복사한 주소를 붙여넣었습니다!");
+            } catch (_) {
+                document.getElementById("inputUrl").focus();
+                showToast("주소 입력칸을 길게 눌러 '붙여넣기'를 선택해주세요");
+            }
+        }
+
+        function smartSuggestName(urlStr) {
+            const safe = normalizeUrl(urlStr);
+            if (!safe) return;
+            const nameInput = document.getElementById("inputName");
+            const catSelect = document.getElementById("inputCategory");
+            try {
+                const host = new URL(safe).hostname.toLowerCase();
+                const map = [
+                    ["joonoo", "주누디자인 인쇄몰", "work"],
+                    ["naver", "네이버", "daily"],
+                    ["youtube", "유튜브", "media"],
+                    ["youtu.be", "유튜브 영상", "media"],
+                    ["daum", "다음", "daily"],
+                    ["coupang", "쿠팡", "shop"],
+                    ["gmarket", "G마켓", "shop"],
+                    ["11st", "11번가", "shop"],
+                    ["kurly", "컬리", "shop"],
+                    ["daangn", "당근", "shop"],
+                    ["kbstar", "KB국민은행", "work"],
+                    ["shinhan", "신한은행", "work"],
+                    ["wooribank", "우리은행", "work"],
+                    ["hanabank", "하나은행", "work"],
+                    ["nonghyup", "NH농협은행", "work"],
+                    ["hometax", "국세청 홈택스", "work"],
+                    ["gov.kr", "정부24", "work"],
+                    ["nhis", "국민건강보험", "work"],
+                    ["google", "구글", "daily"],
+                    ["chatgpt", "챗GPT", "media"]
+                ];
+                let matched = false;
+                for (const [key, title, cat] of map) {
+                    if (host.includes(key)) {
+                        if (!nameInput.value.trim()) nameInput.value = title;
+                        catSelect.value = cat;
+                        matched = true;
+                        break;
+                    }
+                }
+                if (!matched && !nameInput.value.trim()) {
+                    const parts = host.replace(/^www\.|^m\./, "").split(".");
+                    nameInput.value = parts[0].toUpperCase();
+                }
+                triggerHaptic(12);
+            } catch (_) {}
+        }
+
+        /* =========================================================
+           5. 추가 / 수정 / 순서변경 / 삭제 (내 폰 즉시 반영)
+           ========================================================= */
+        function openAddForm(editItem = null) {
+            triggerHaptic(18);
+            const form = document.getElementById("addForm");
+            const title = document.getElementById("formTitle");
+            const idInput = document.getElementById("editingId");
+            const nameInput = document.getElementById("inputName");
+            const urlInput = document.getElementById("inputUrl");
+            const catSelect = document.getElementById("inputCategory");
+            const saveBtn = document.getElementById("btnSaveLink");
+
+            if (editItem) {
+                title.textContent = "✏️ 즐겨찾기 수정";
+                idInput.value = editItem.id;
+                nameInput.value = editItem.name;
+                urlInput.value = editItem.url;
+                catSelect.value = VALID_CATEGORIES.includes(editItem.category) ? editItem.category : "daily";
+                saveBtn.textContent = "수정 내용 저장 ✓";
+            } else {
+                title.textContent = "➕ 새 즐겨찾기 등록";
+                idInput.value = "";
+                nameInput.value = "";
+                urlInput.value = "";
+                catSelect.value = currentFilter !== "all" ? currentFilter : "daily";
+                saveBtn.textContent = "내 폰에 저장하기 ✓";
+            }
+
+            form.classList.add("open");
+            form.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+
+        function closeAddForm() {
+            document.getElementById("addForm").classList.remove("open");
+        }
+
+        function saveLink() {
+            const editId = document.getElementById("editingId").value;
+            const name = document.getElementById("inputName").value.trim();
+            const rawUrl = document.getElementById("inputUrl").value.trim();
+            const category = document.getElementById("inputCategory").value;
+
+            const safeUrl = normalizeUrl(rawUrl);
+            if (!safeUrl) return showToast("⚠️ 올바른 사이트 주소를 입력해주세요");
+            const finalName = name || new URL(safeUrl).hostname.replace(/^www\.|^m\./, "");
+
+            triggerHaptic(25);
+
+            if (editId) {
+                const idx = links.findIndex(item => String(item.id) === String(editId));
+                if (idx !== -1) {
+                    links[idx] = { ...links[idx], name: finalName, url: safeUrl, category };
+                }
+                showToast(`✅ [${finalName}] 수정되었습니다!`);
+            } else {
+                links.unshift({
+                    id: "u_" + Date.now(),
+                    name: finalName,
+                    url: safeUrl,
+                    category: VALID_CATEGORIES.includes(category) ? category : "daily"
+                });
+                showToast(`✅ [${finalName}] 내 즐겨찾기에 추가되었습니다!`);
+            }
+
+            persistLinks();
+            renderLinks();
+            closeAddForm();
+        }
+
+        function moveLinkUp(id) {
+            triggerHaptic(15);
+            const idx = links.findIndex(item => String(item.id) === String(id));
+            if (idx <= 0) return;
+            const targetCat = links[idx].category;
+            for (let prev = idx - 1; prev >= 0; prev--) {
+                if (links[prev].category === targetCat) {
+                    const temp = links[prev];
+                    links[prev] = links[idx];
+                    links[idx] = temp;
+                    persistLinks();
+                    renderLinks();
+                    showToast("▲ 위로 이동했습니다");
+                    return;
+                }
+            }
+            showToast("이미 이 카테고리의 맨 위입니다");
+        }
+
+        function deleteLink(id, nameStr) {
+            if (!confirm(`[${nameStr}] 즐겨찾기를 삭제할까요?`)) return;
+            triggerHaptic(30);
+            links = links.filter(item => String(item.id) !== String(id));
+            persistLinks();
+            renderLinks();
+            showToast(`🗑️ [${nameStr}] 삭제되었습니다`);
+        }
+
+        function toggleEditMode() {
+            triggerHaptic(18);
+            const isEdit = document.body.classList.toggle("edit-mode");
+            const btn = document.getElementById("btnEditToggle");
+            btn.textContent = isEdit ? "✓ 완료" : "✏️ 편집";
+            showToast(isEdit ? "✏️ 편집 모드: 순서이동(▲)·수정(✏️)·삭제(×)가 가능합니다" : "편집이 완료되었습니다");
+        }
+
+        /* =========================================================
+           6. 렌더링
+           ========================================================= */
+        function renderLinks() {
+            const query = (document.getElementById("searchInput").value || "").trim();
+            VALID_CATEGORIES.forEach(cat => {
+                const el = document.getElementById(`grid-${cat}`);
+                if (el) el.textContent = "";
+            });
+
+            let visibleCount = 0;
+
+            links.forEach(link => {
+                const safeUrl = normalizeUrl(link.url);
+                if (!safeUrl) return;
+                const nameStr = String(link.name || safeUrl);
+
+                if (!matchesQuery(nameStr, safeUrl, query)) return;
+
+                const cat = VALID_CATEGORIES.includes(link.category) ? link.category : "daily";
+                if (currentFilter !== "all" && currentFilter !== cat) return;
+
+                const grid = document.getElementById(`grid-${cat}`);
+                if (!grid) return;
+
+                visibleCount++;
+
+                const wrapper = document.createElement("div");
+                wrapper.className = "link-wrapper";
+
+                const card = document.createElement("div");
+                card.className = `link-card cat-${cat}`;
+
+                const anchor = document.createElement("a");
+                anchor.href = safeUrl;
+                anchor.target = "_blank";
+                anchor.rel = "noopener noreferrer";
+                anchor.className = "link-anchor";
+                anchor.addEventListener("click", (e) => {
+                    if (document.body.classList.contains("edit-mode")) {
+                        e.preventDefault();
+                        openAddForm(link);
+                        return;
+                    }
+                    triggerHaptic(18);
+                });
+
+                const titleSpan = document.createElement("span");
+                titleSpan.className = "link-title";
+                titleSpan.textContent = nameStr;
+                anchor.appendChild(titleSpan);
+
+                const urlPreview = document.createElement("span");
+                urlPreview.className = "link-url-preview";
+                try {
+                    urlPreview.textContent = new URL(safeUrl).hostname.replace(/^www\.|^m\./, "");
+                } catch (_) {
+                    urlPreview.textContent = safeUrl;
+                }
+                anchor.appendChild(urlPreview);
+
+                // 일반 모드 액션 버튼 (카톡 공유 / 주소 복사)
+                const normalControls = document.createElement("div");
+                normalControls.className = "card-actions normal-controls";
+
+                if (canNativeShare) {
+                    const shareBtn = document.createElement("button");
+                    shareBtn.type = "button";
+                    shareBtn.className = "icon-action-btn share-btn";
+                    shareBtn.title = "지인에게 공유";
+                    shareBtn.textContent = "📤";
+                    shareBtn.addEventListener("click", async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        triggerHaptic(22);
+                        try {
+                            await navigator.share({ title: nameStr, text: nameStr, url: safeUrl });
+                        } catch (_) {}
+                    });
+                    normalControls.appendChild(shareBtn);
+                }
+
+                const copyBtn = document.createElement("button");
+                copyBtn.type = "button";
+                copyBtn.className = "icon-action-btn";
+                copyBtn.title = "주소 복사";
+                copyBtn.textContent = "📋";
+                copyBtn.addEventListener("click", async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    triggerHaptic(28);
+                    try {
+                        await navigator.clipboard.writeText(safeUrl);
+                        copyBtn.textContent = "✓";
+                        showToast(`📋 [${nameStr}] 주소가 복사되었습니다!`);
+                        setTimeout(() => { copyBtn.textContent = "📋"; }, 1200);
+                    } catch (_) {
+                        prompt("아래 주소를 복사하세요:", safeUrl);
+                    }
+                });
+                normalControls.appendChild(copyBtn);
+
+                // 편집 모드 컨트롤 (위로 이동 / 수정 / 삭제)
+                const editControls = document.createElement("div");
+                editControls.className = "edit-controls";
+
+                const upBtn = document.createElement("button");
+                upBtn.type = "button";
+                upBtn.className = "edit-mini-btn";
+                upBtn.title = "위로 이동";
+                upBtn.textContent = "▲";
+                upBtn.addEventListener("click", () => moveLinkUp(link.id));
+
+                const editBtn = document.createElement("button");
+                editBtn.type = "button";
+                editBtn.className = "edit-mini-btn";
+                editBtn.title = "수정";
+                editBtn.textContent = "✏️";
+                editBtn.addEventListener("click", () => openAddForm(link));
+
+                const delBtn = document.createElement("button");
+                delBtn.type = "button";
+                delBtn.className = "edit-mini-btn danger";
+                delBtn.title = "삭제";
+                delBtn.textContent = "×";
+                delBtn.addEventListener("click", () => deleteLink(link.id, nameStr));
+
+                editControls.appendChild(upBtn);
+                editControls.appendChild(editBtn);
+                editControls.appendChild(delBtn);
+
+                card.appendChild(anchor);
+                card.appendChild(normalControls);
+                card.appendChild(editControls);
+                wrapper.appendChild(card);
+                grid.appendChild(wrapper);
+            });
+
+            VALID_CATEGORIES.forEach(cat => {
+                const sec = document.getElementById(`section-${cat}`);
+                const grid = document.getElementById(`grid-${cat}`);
+                if (!sec || !grid) return;
+
+                if (currentFilter !== "all" && currentFilter !== cat) {
+                    sec.style.display = "none";
+                } else if (grid.children.length === 0) {
+                    if (query) {
+                        sec.style.display = "none";
+                    } else if (currentFilter === cat) {
+                        sec.style.display = "block";
+                        grid.innerHTML = "<div class='empty-msg'>아직 등록된 사이트가 없습니다.<br>위의 [➕ 내 즐겨찾기 추가] 버튼을 눌러보세요!</div>";
+                    } else {
+                        sec.style.display = "none";
+                    }
+                } else {
+                    sec.style.display = "block";
+                }
+            });
+
+            document.getElementById("linkCount").textContent = `${links.length}개 보관 중`;
+        }
+
+        function handleSearch(val) {
+            document.getElementById("searchClear").style.display = val ? "flex" : "none";
+            renderLinks();
+        }
+
+        function clearSearch() {
+            const input = document.getElementById("searchInput");
+            input.value = "";
+            document.getElementById("searchClear").style.display = "none";
+            renderLinks();
+        }
+
+        function filterCategory(cat, chipEl) {
+            triggerHaptic(15);
+            currentFilter = cat;
+            document.querySelectorAll(".cat-chip").forEach(c => c.classList.remove("active"));
+            chipEl.classList.add("active");
+            renderLinks();
+        }
+
+        /* =========================================================
+           7. 폰 교체 1초 이사(카톡 원터치 링크) / 백업 / 복원 / 앱 공유
+           ========================================================= */
+        function encodeMigrationToken(list) {
+            const compact = list.map(item => [item.name, item.url, item.category]);
+            const bytes = new TextEncoder().encode(JSON.stringify(compact));
+            let bin = "";
+            for (let i = 0; i < bytes.length; i++) {
+                bin += String.fromCharCode(bytes[i]);
+            }
+            return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+        }
+
+        function decodeMigrationToken(rawInput) {
+            let token = String(rawInput || "").trim();
+            const hashIdx = token.indexOf("#import=");
+            if (hashIdx !== -1) {
+                token = token.slice(hashIdx + 8).split("&")[0];
+            }
+            token = token.replace(/-/g, "+").replace(/_/g, "/");
+            while (token.length % 4 !== 0) token += "=";
+
+            const bin = atob(token);
+            const bytes = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) {
+                bytes[i] = bin.charCodeAt(i);
+            }
+            const parsed = JSON.parse(new TextDecoder().decode(bytes));
+            if (!Array.isArray(parsed)) throw new Error("INVALID_TOKEN");
+
+            const restored = parsed
+                .map((row, idx) => {
+                    if (Array.isArray(row)) {
+                        const safe = normalizeUrl(row[1]);
+                        if (!safe) return null;
+                        return {
+                            id: "mig_" + Date.now() + "_" + idx,
+                            name: String(row[0] || safe).slice(0, 80),
+                            url: safe,
+                            category: VALID_CATEGORIES.includes(row[2]) ? row[2] : "daily"
+                        };
+                    }
+                    if (row && typeof row === "object") {
+                        const safe = normalizeUrl(row.url);
+                        if (!safe) return null;
+                        return {
+                            id: "mig_" + Date.now() + "_" + idx,
+                            name: String(row.name || safe).slice(0, 80),
+                            url: safe,
+                            category: VALID_CATEGORIES.includes(row.category) ? row.category : "daily"
+                        };
+                    }
+                    return null;
+                })
+                .filter(Boolean);
+
+            if (!restored.length) throw new Error("EMPTY_TOKEN");
+            return restored;
+        }
+
+        async function sendMigrationLink() {
+            triggerHaptic(22);
+            const token = encodeMigrationToken(links);
+            const baseUrl = "https://joonoodesign.github.io/my-link/";
+            const magicUrl = `${baseUrl}#import=${token}`;
+
+            // 링크가 너무 많아 카톡 URL 글자수(3,800자)를 넘을 경우 파일 백업으로 안전 안내
+            if (magicUrl.length > 3800) {
+                exportBackup();
+                alert("등록된 즐겨찾기가 많아 백업 파일(.json)로 저장해 드렸습니다. 새 휴대폰에서 '백업 파일 불러오기'로 복원해주세요!");
+                return;
+            }
+
+            const msgText = `[주누 마이링크 내 즐겨찾기 이사 링크]\n새 휴대폰에서 아래 주소를 터치하면 저장해 둔 즐겨찾기(${links.length}개)가 그대로 복원됩니다!`;
+
+            if (canNativeShare) {
+                try {
+                    await navigator.share({
+                        title: "내 주누 마이링크 이사 보관함",
+                        text: msgText,
+                        url: magicUrl
+                    });
+                    return;
+                } catch (_) {}
+            }
+
+            try {
+                await navigator.clipboard.writeText(magicUrl);
+                alert("이사 링크가 복사되었습니다!\n카카오톡 '나와의 채팅'이나 메모장에 붙여넣어 보관하신 뒤, 새 휴대폰에서 터치만 하시면 그대로 복원됩니다.");
+            } catch (_) {
+                prompt("아래 이사 링크를 복사해 카톡 '나와의 채팅'에 보내두세요:", magicUrl);
+            }
+        }
+
+        async function pasteMigrationCode() {
+            triggerHaptic(18);
+            let raw = "";
+            try {
+                raw = await navigator.clipboard.readText();
+            } catch (_) {}
+            if (!raw || (!raw.includes("#import=") && raw.trim().length < 10)) {
+                raw = prompt("복사해 둔 '이사 링크' 또는 '복원 코드'를 여기에 붙여넣어 주세요:") || "";
+            }
+            if (!raw.trim()) return;
+
+            try {
+                const restored = decodeMigrationToken(raw);
+                if (!confirm(`이전에 보관된 즐겨찾기 ${restored.length}개를 이 휴대폰으로 불러올까요?`)) return;
+                links = restored;
+                persistLinks();
+                renderLinks();
+                closeSettings();
+                showToast(`🎉 ${restored.length}개 즐겨찾기가 완벽하게 이사되었습니다!`);
+            } catch (_) {
+                alert("올바른 이사 링크가 아닙니다. 카톡에 보내둔 이사 링크 전체를 복사했는지 확인해주세요.");
+            }
+        }
+
+        function checkHashImport() {
+            const hash = window.location.hash || "";
+            if (!hash.startsWith("#import=")) return;
+            try {
+                const restored = decodeMigrationToken(hash);
+                history.replaceState(null, "", window.location.pathname + window.location.search);
+                setTimeout(() => {
+                    if (confirm(`📦 이전 휴대폰에서 보낸 즐겨찾기 ${restored.length}개를 이 폰에 그대로 복원할까요?`)) {
+                        links = restored;
+                        persistLinks();
+                        renderLinks();
+                        showToast(`🎉 ${restored.length}개 즐겨찾기가 그대로 복원되었습니다!`);
+                    }
+                }, 150);
+            } catch (_) {
+                history.replaceState(null, "", window.location.pathname + window.location.search);
+            }
+        }
+
+        function exportBackup() {
+            triggerHaptic(20);
+            const blob = new Blob([JSON.stringify(links, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            const dateStr = new Date().toISOString().slice(0, 10);
+            a.href = url;
+            a.download = `주누마이링크_백업_${dateStr}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("💾 내 즐겨찾기 백업 파일이 저장되었습니다!");
+        }
+
+        function importBackup(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                try {
+                    const parsed = JSON.parse(String(reader.result));
+                    if (!Array.isArray(parsed)) throw new Error("INVALID");
+                    const cleaned = parsed
+                        .filter(item => item && normalizeUrl(item.url))
+                        .map((item, idx) => ({
+                            id: item.id || ("imp_" + Date.now() + "_" + idx),
+                            name: String(item.name || item.url).slice(0, 80),
+                            url: normalizeUrl(item.url),
+                            category: VALID_CATEGORIES.includes(item.category) ? item.category : "daily"
+                        }));
+                    if (!cleaned.length) throw new Error("EMPTY");
+                    links = cleaned;
+                    persistLinks();
+                    renderLinks();
+                    closeSettings();
+                    showToast(`✅ ${cleaned.length}개 즐겨찾기를 성공적으로 불러왔습니다!`);
+                } catch (_) {
+                    alert("올바른 주누 마이링크 백업 파일이 아닙니다.");
+                } finally {
+                    event.target.value = "";
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function resetDefaults() {
+            if (!confirm("현재 목록을 지우고 처음 기본 추천 사이트 목록으로 되돌릴까요?")) return;
+            links = DEFAULT_LINKS.map(item => ({ ...item }));
+            persistLinks();
+            renderLinks();
+            closeSettings();
+            showToast("🔄 기본 추천 목록으로 복원되었습니다");
+        }
+
+        async function shareThisApp() {
+            triggerHaptic(22);
+            const shareUrl = "https://joonoodesign.github.io/my-link/";
+            const shareData = {
+                title: "주누 마이링크 - 내 손안의 큰글씨 즐겨찾기",
+                text: "자주 가는 사이트를 내 폰 바탕화면에서 큰 글씨로 터치 한 번에 여는 무료 즐겨찾기 앱입니다!",
+                url: shareUrl
+            };
+            if (canNativeShare) {
+                try {
+                    await navigator.share(shareData);
+                    return;
+                } catch (_) {}
+            }
+            try {
+                await navigator.clipboard.writeText(shareUrl);
+                showToast("💌 앱 주소가 복사되었습니다! 카톡에 붙여넣어 공유해보세요.");
+            } catch (_) {
+                prompt("이 주소를 복사해 지인에게 전달해보세요:", shareUrl);
+            }
+        }
+
+        /* =========================================================
+           8. PWA 설치 및 유틸리티
+           ========================================================= */
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("./sw.js?v=100").then(reg => {
+                    reg.update();
+                }).catch(() => {});
+            });
+        }
+
+        window.addEventListener("beforeinstallprompt", (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const btn = document.getElementById("btnInstall");
+            if (btn) btn.style.display = "flex";
+        });
+
+        async function installApp() {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === "accepted") {
+                document.getElementById("btnInstall").style.display = "none";
+            }
+            deferredPrompt = null;
+        }
+
+        function triggerHaptic(ms = 18) {
+            if (navigator.vibrate) {
+                try { navigator.vibrate(ms); } catch (_) {}
+            }
+        }
+
+        function showToast(msg) {
+            const el = document.getElementById("toast");
+            el.textContent = msg;
+            el.classList.add("show");
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                el.classList.remove("show");
+            }, 2000);
+        }
+
+        function openSettings() {
+            triggerHaptic(15);
+            document.getElementById("settingsModal").classList.add("open");
+        }
+
+        function closeSettings() {
+            document.getElementById("settingsModal").classList.remove("open");
+        }
+
+        function handleBackdropClick(e) {
+            if (e.target.id === "settingsModal") closeSettings();
+        }
+
+        loadPreferences();
+        window.addEventListener("DOMContentLoaded", () => {
+            loadLinks();
+            checkHashImport();
+        });
+        window.addEventListener("hashchange", checkHashImport);
+    </script>
+</body>
+</html>
