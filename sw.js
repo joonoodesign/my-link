@@ -1,5 +1,5 @@
 // 주누 마이링크 서비스워커 (0.01초 즉시 구동 & 오프라인 100% 작동)
-const CACHE_NAME = 'joonoo-mylink-v100';
+const CACHE_NAME = 'joonoo-mylink-v102';
 const STATIC_ASSETS = [
   './',
   './index.html',

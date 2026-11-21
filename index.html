@@ -247,23 +247,124 @@
             border-color: #FFD700;
         }
 
-        /* 앱 설치 유도 배너 */
-        .install-banner {
-            display: none;
+        /* 안드로이드 / 아이폰 원클릭 앱 설치 허브 */
+        .install-hub {
             width: 100%;
-            background: var(--accent-gold-bg);
-            color: #000000;
+            background: var(--card-bg);
+            border: 2px solid #F59E0B;
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.18);
+        }
+
+        .install-hub.hidden {
+            display: none !important;
+        }
+
+        .install-hub-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 9px;
+            gap: 6px;
+        }
+
+        .install-hub-title {
+            font-size: 16px;
+            font-weight: 900;
+            color: var(--text-color);
+        }
+
+        .install-hub-dismiss {
+            background: transparent;
             border: none;
-            border-radius: 14px;
-            padding: 13px 16px;
+            color: var(--text-muted);
             font-family: inherit;
-            font-size: 18px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            padding: 2px 6px;
+        }
+
+        .install-btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .os-install-btn {
+            border-radius: 13px;
+            padding: 12px 8px;
+            font-family: inherit;
+            font-size: 16px;
             font-weight: 900;
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            box-shadow: 0 4px 14px rgba(245, 183, 0, 0.35);
+            gap: 3px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.25;
+            min-width: 0;
+        }
+
+        .os-install-btn:active {
+            transform: scale(0.97);
+        }
+
+        .os-install-btn.android-btn {
+            background: #059669;
+            color: #ffffff;
+            border-color: #059669;
+        }
+
+        .os-install-btn.ios-btn {
+            background: #1e293b;
+            color: #ffffff;
+            border-color: #334155;
+        }
+
+        .os-install-btn.recommended {
+            box-shadow: 0 0 0 3px #FFD700, 0 5px 14px rgba(0, 0, 0, 0.25);
+        }
+
+        .os-rec-tag {
+            display: none;
+            font-size: 12px;
+            background: #FFD700;
+            color: #000000;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-weight: 900;
+        }
+
+        .os-install-btn.recommended .os-rec-tag {
+            display: inline-block;
+        }
+
+        .guide-step-box {
+            background: var(--bg-color);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            font-size: 18px;
+            font-weight: 800;
+            line-height: 1.55;
+            word-break: keep-all;
+        }
+
+        .guide-highlight {
+            display: inline-block;
+            background: #FEF3C7;
+            color: #92400E;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-weight: 900;
+            border: 1px solid #F59E0B;
         }
 
         /* =========================================================
@@ -990,9 +1091,15 @@
                 </div>
             </header>
 
-            <button type="button" id="btnInstall" class="install-banner" onclick="installApp()">
-                📲 스마트폰 바탕화면에 앱으로 설치하기
-            </button>
+            <div id="installHub" class="install-hub">
+                <div class="install-hub-head">
+                    <span id="installHubLabel" class="install-hub-title">📲 내 폰 바탕화면에 앱으로 깔아두세요!</span>
+                    <button type="button" class="install-hub-dismiss" onclick="dismissInstallHub()">숨기기 ✕</button>
+                </div>
+                <button type="button" id="btnSmartInstall" class="os-install-btn android-btn recommended" style="width:100%; font-size:19px; padding:15px 12px;" onclick="handleSmartInstall()">
+                    📲 바탕화면에 무료 앱 바로 설치하기
+                </button>
+            </div>
 
             <div class="search-box">
                 <input type="search" id="searchInput" class="search-input" placeholder="🔍 이름·초성 검색 (예: ㄴㅇㅂ, ㅌㅂ)" oninput="handleSearch(this.value)" autocomplete="off">
@@ -1137,6 +1244,17 @@
                     🔄 처음 추천 사이트 목록으로 초기화
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- 📲 초보자용 원터치 앱 설치 안내 모달 -->
+    <div id="installGuideModal" class="modal-backdrop" onclick="if(event.target.id==='installGuideModal')closeInstallGuide()">
+        <div class="settings-sheet" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+            <div class="sheet-header">
+                <h3 id="guideTitle">📲 바탕화면 앱 설치</h3>
+                <button type="button" class="sheet-close" onclick="closeInstallGuide()">닫기 ✕</button>
+            </div>
+            <div id="guideContent"></div>
         </div>
     </div>
 
@@ -1914,31 +2032,224 @@
         }
 
         /* =========================================================
-           8. PWA 설치 및 유틸리티
+           8. 안드로이드 / 아이폰 전자동 환경 맞춤 앱 설치 허브
+              (카톡·문자 링크 클릭자도 주소 입력 없이 자동 전환·설치)
            ========================================================= */
+        const ua = navigator.userAgent || "";
+        const isIos = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+        const isAndroid = /Android/i.test(ua);
+        const isKakao = /KAKAOTALK/i.test(ua);
+        const isInApp = /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line|Band|DaumApps/i.test(ua);
+        const isSamsung = /SamsungBrowser/i.test(ua);
+        const isSafari = isIos && /Safari/i.test(ua) && !/CriOS|FxiOS|EdgiOS|NAVER|KAKAOTALK|Whale/i.test(ua);
+        const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
-                navigator.serviceWorker.register("./sw.js?v=100").then(reg => {
+                navigator.serviceWorker.register("./sw.js?v=102").then(reg => {
                     reg.update();
                 }).catch(() => {});
             });
         }
 
+        function initInstallHub() {
+            const hub = document.getElementById("installHub");
+            if (!hub) return;
+
+            // 이미 바탕화면 앱으로 실행 중이면 설치 안내 박스 숨김
+            if (isStandalone || sessionStorage.getItem("mylink_hide_install") === "1") {
+                hub.classList.add("hidden");
+                return;
+            }
+
+            // 카카오톡 채팅방에서 링크를 눌러 들어온 경우: 주소 복사 필요 없이 자동으로 크롬(갤럭시) / 사파리(아이폰) 실행!
+            if (isKakao && !sessionStorage.getItem("mylink_kakao_jumped")) {
+                sessionStorage.setItem("mylink_kakao_jumped", "1");
+                const hashPart = window.location.hash || "";
+                if (isAndroid) {
+                    const targetUrl = "https://joonoodesign.github.io/my-link/?auto_install=android" + hashPart;
+                    const noProto = targetUrl.replace(/^https?:\/\//i, "");
+                    window.location.href = `intent://${noProto}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(targetUrl)};end`;
+                    return;
+                }
+                if (isIos) {
+                    const targetUrl = "https://joonoodesign.github.io/my-link/?auto_install=ios" + hashPart;
+                    window.location.href = "kakaotalk://web/openExternal?url=" + encodeURIComponent(targetUrl);
+                    return;
+                }
+            }
+
+            // 접속한 기기(갤럭시 vs 아이폰 vs PC) 자동 판별하여 버튼 1개로 맞춤 표시
+            const btn = document.getElementById("btnSmartInstall");
+            const label = document.getElementById("installHubLabel");
+            if (isIos) {
+                label.textContent = "🍎 아이폰 자동 감지 완료!";
+                btn.textContent = "📲 내 아이폰 바탕화면에 앱 설치하기";
+                btn.className = "os-install-btn ios-btn recommended";
+            } else if (isAndroid) {
+                label.textContent = "🤖 갤럭시(안드로이드) 자동 감지 완료!";
+                btn.textContent = "📲 내 폰 바탕화면에 앱 바로 설치하기";
+                btn.className = "os-install-btn android-btn recommended";
+            } else {
+                label.textContent = "💻 내 컴퓨터에 바로가기 앱 설치";
+                btn.textContent = "📲 바탕화면에 앱 바로 설치하기";
+                btn.className = "os-install-btn android-btn recommended";
+            }
+
+            // 카톡에서 크롬/사파리로 자동 전환되어 도착한 직후 설치 안내 자동 실행
+            const params = new URLSearchParams(window.location.search);
+            const autoTarget = params.get("auto_install");
+            if (autoTarget === "ios") {
+                history.replaceState(null, "", window.location.pathname + window.location.hash);
+                setTimeout(() => showIosStepModal(), 250);
+            } else if (autoTarget === "android") {
+                history.replaceState(null, "", window.location.pathname + window.location.hash);
+                setTimeout(() => showAndroidArrivalModal(), 350);
+            }
+        }
+
+        function handleSmartInstall() {
+            if (isIos) {
+                handleIosInstall();
+            } else {
+                handleAndroidInstall();
+            }
+        }
+
+        function dismissInstallHub() {
+            sessionStorage.setItem("mylink_hide_install", "1");
+            document.getElementById("installHub").classList.add("hidden");
+        }
+
         window.addEventListener("beforeinstallprompt", (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            const btn = document.getElementById("btnInstall");
-            if (btn) btn.style.display = "flex";
+            // 크롬 자동 점프 직후 대기 창이 열려 있다면 즉시 원클릭 설치 버튼 활성화
+            const directBtn = document.getElementById("btnDirectPrompt");
+            if (directBtn) directBtn.style.display = "flex";
         });
 
-        async function installApp() {
-            if (!deferredPrompt) return;
+        window.addEventListener("appinstalled", () => {
+            deferredPrompt = null;
+            document.getElementById("installHub").classList.add("hidden");
+            closeInstallGuide();
+            showToast("🎉 바탕화면에 '주누 마이링크' 앱 설치가 완료되었습니다!");
+        });
+
+        async function triggerNativePrompt() {
+            if (!deferredPrompt) return false;
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === "accepted") {
-                document.getElementById("btnInstall").style.display = "none";
-            }
             deferredPrompt = null;
+            if (outcome === "accepted") {
+                document.getElementById("installHub").classList.add("hidden");
+                closeInstallGuide();
+            }
+            return true;
+        }
+
+        async function handleAndroidInstall() {
+            triggerHaptic(22);
+
+            // 1. 크롬/삼성인터넷 자동 설치 팝업이 준비된 경우: 그 자리에서 0.1초 즉시 설치!
+            if (deferredPrompt) {
+                await triggerNativePrompt();
+                return;
+            }
+
+            // 2. 카카오톡·네이버·밴드 등 인앱 화면에서 누른 경우: 주소 입력 없이 자동으로 정식 크롬 실행!
+            if (isAndroid && isInApp) {
+                const targetUrl = "https://joonoodesign.github.io/my-link/?auto_install=android" + (window.location.hash || "");
+                const noProto = targetUrl.replace(/^https?:\/\//i, "");
+                const fallback = encodeURIComponent(targetUrl);
+                window.location.href = `intent://${noProto}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${fallback};end`;
+                return;
+            }
+
+            // 3. 그 외(삼성인터넷 또는 PC/타기기에서 누른 경우): 왕큰 글씨 2초 안내창 표시
+            showAndroidArrivalModal();
+        }
+
+        function showAndroidArrivalModal() {
+            const title = document.getElementById("guideTitle");
+            const content = document.getElementById("guideContent");
+            title.textContent = "🤖 갤럭시 · 안드로이드 앱 설치";
+
+            if (deferredPrompt) {
+                content.innerHTML = `
+                    <div class="guide-step-box" style="text-align:center;">
+                        아래 노란 버튼을 한 번만 누르시면<br>바탕화면에 <strong>주누 마이링크</strong> 앱이 바로 설치됩니다!
+                    </div>
+                    <button type="button" class="add-btn" style="width:100%; background:linear-gradient(135deg,#FFD700,#F5B700); color:#000;" onclick="triggerNativePrompt()">
+                        📲 지금 바로 바탕화면에 설치하기
+                    </button>
+                `;
+            } else if (isSamsung) {
+                content.innerHTML = `
+                    <div class="guide-step-box">
+                        1️⃣ 화면 맨 아래 오른쪽 <span class="guide-highlight">≡ (줄 3개)</span> 버튼을 누르세요.<br><br>
+                        2️⃣ <span class="guide-highlight">+ 현재 페이지 추가</span> → <span class="guide-highlight">홈 화면</span>을 누르면 바탕화면에 앱이 생깁니다!
+                    </div>
+                    <button type="button" id="btnDirectPrompt" class="add-btn" style="display:none; width:100%; margin-top:8px;" onclick="triggerNativePrompt()">
+                        📲 원터치 바로 설치하기
+                    </button>
+                `;
+            } else {
+                content.innerHTML = `
+                    <div class="guide-step-box">
+                        1️⃣ 화면 오른쪽 맨 위 <span class="guide-highlight">⋮ (점 3개)</span> 버튼을 누르세요.<br><br>
+                        2️⃣ 메뉴에서 <span class="guide-highlight">📲 앱 설치</span> 또는 <span class="guide-highlight">홈 화면에 추가</span>를 누르면 바탕화면에 바로 설치됩니다!
+                    </div>
+                    <button type="button" id="btnDirectPrompt" class="add-btn" style="display:none; width:100%; margin-top:8px; background:linear-gradient(135deg,#FFD700,#F5B700); color:#000;" onclick="triggerNativePrompt()">
+                        📲 지금 바로 바탕화면에 설치하기
+                    </button>
+                `;
+            }
+            document.getElementById("installGuideModal").classList.add("open");
+        }
+
+        function handleIosInstall() {
+            triggerHaptic(22);
+            const targetUrl = "https://joonoodesign.github.io/my-link/?auto_install=ios" + (window.location.hash || "");
+
+            // 1. 아이폰 카카오톡 안에서 누른 경우: 주소 복사 필요 없이 자동으로 사파리(Safari)를 켜서 열어줌!
+            if (isIos && isKakao) {
+                window.location.href = "kakaotalk://web/openExternal?url=" + encodeURIComponent(targetUrl);
+                setTimeout(() => showIosStepModal(), 1200);
+                return;
+            }
+
+            // 2. 사파리 또는 기타 화면: 초보자용 왕큰 그림 안내 표시
+            showIosStepModal();
+        }
+
+        function showIosStepModal() {
+            const title = document.getElementById("guideTitle");
+            const content = document.getElementById("guideContent");
+            title.textContent = "🍎 아이폰 바탕화면 앱 설치 (3초 완료)";
+
+            if (isIos && !isSafari) {
+                content.innerHTML = `
+                    <div class="guide-step-box">
+                        지금 보고 계신 창에서는 애플 정책상 바로 설치가 막혀 있습니다.<br><br>
+                        1️⃣ 화면 맨 아래(또는 오른쪽 위) <span class="guide-highlight">⋯</span> 또는 <span class="guide-highlight">나침반(Safari로 열기)</span>을 먼저 눌러주세요!<br><br>
+                        2️⃣ 열린 화면 맨 아래 <span class="guide-highlight">↑ (공유)</span> → <span class="guide-highlight">홈 화면에 추가 ➕</span>를 누르면 끝납니다!
+                    </div>
+                `;
+            } else {
+                content.innerHTML = `
+                    <div class="guide-step-box">
+                        주소 입력 없이 아래 <strong>딱 2번만</strong> 누르시면 아이폰 바탕화면에 앱이 깔립니다!<br><br>
+                        1️⃣ 화면 <strong>맨 아래 한가운데</strong> 있는 네모 화살표 <span class="guide-highlight">↑ (공유 버튼)</span>을 누르세요.<br><br>
+                        2️⃣ 올라온 메뉴를 살짝 내려 <span class="guide-highlight">홈 화면에 추가 ➕</span> → 오른쪽 위 <span class="guide-highlight">추가</span>를 누르면 완료!
+                    </div>
+                `;
+            }
+            document.getElementById("installGuideModal").classList.add("open");
+        }
+
+        function closeInstallGuide() {
+            document.getElementById("installGuideModal").classList.remove("open");
         }
 
         function triggerHaptic(ms = 18) {
@@ -1973,6 +2284,7 @@
         loadPreferences();
         window.addEventListener("DOMContentLoaded", () => {
             loadLinks();
+            initInstallHub();
             checkHashImport();
         });
         window.addEventListener("hashchange", checkHashImport);
