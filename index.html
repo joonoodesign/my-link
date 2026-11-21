@@ -1706,14 +1706,15 @@
                     const shareBtn = document.createElement("button");
                     shareBtn.type = "button";
                     shareBtn.className = "icon-action-btn share-btn";
-                    shareBtn.title = "지인에게 공유";
+                    shareBtn.title = "카카오톡 / 지인 공유";
                     shareBtn.textContent = "📤";
                     shareBtn.addEventListener("click", async (e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         triggerHaptic(22);
                         try {
-                            await navigator.share({ title: nameStr, text: nameStr, url: safeUrl });
+                            const fullMsg = `[${nameStr}]\n${safeUrl}`;
+                            await navigator.share({ title: nameStr, text: fullMsg, url: safeUrl });
                         } catch (_) {}
                     });
                     normalControls.appendChild(shareBtn);
@@ -2012,9 +2013,11 @@
         async function shareThisApp() {
             triggerHaptic(22);
             const shareUrl = "https://joonoodesign.github.io/my-link/";
+            const shareTitle = "주누 마이링크 - 내 손안의 큰글씨 즐겨찾기";
+            const shareText = `[주누 마이링크]\n자주 가는 사이트를 내 폰 바탕화면에서 큰 글씨로 터치 한 번에 여는 무료 즐겨찾기 앱입니다!\n${shareUrl}`;
             const shareData = {
-                title: "주누 마이링크 - 내 손안의 큰글씨 즐겨찾기",
-                text: "자주 가는 사이트를 내 폰 바탕화면에서 큰 글씨로 터치 한 번에 여는 무료 즐겨찾기 앱입니다!",
+                title: shareTitle,
+                text: shareText,
                 url: shareUrl
             };
             if (canNativeShare) {
