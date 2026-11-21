@@ -1264,7 +1264,8 @@
         const STORAGE_KEY = "joonoo_mylink_items_v1";
         const VALID_CATEGORIES = ["daily", "shop", "work", "media"];
         const CHOSUNG_LIST = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
-        const canNativeShare = typeof navigator.share === "function";
+        const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const canMobileShare = typeof navigator.share === "function" && isMobileDevice;
 
         // 최초 설치자를 위한 국민 필수 추천 사이트 기본 세트
         const DEFAULT_LINKS = [
@@ -1702,23 +1703,32 @@
                 const normalControls = document.createElement("div");
                 normalControls.className = "card-actions normal-controls";
 
-                if (canNativeShare) {
-                    const shareBtn = document.createElement("button");
-                    shareBtn.type = "button";
-                    shareBtn.className = "icon-action-btn share-btn";
-                    shareBtn.title = "카카오톡 / 지인 공유";
-                    shareBtn.textContent = "📤";
-                    shareBtn.addEventListener("click", async (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        triggerHaptic(22);
+                const shareBtn = document.createElement("button");
+                shareBtn.type = "button";
+                shareBtn.className = "icon-action-btn share-btn";
+                shareBtn.title = isMobileDevice ? "카카오톡 / 지인 공유" : "카톡 붙여넣기용 복사";
+                shareBtn.textContent = "📤";
+                shareBtn.addEventListener("click", async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    triggerHaptic(22);
+                    const fullMsg = `[${nameStr}]\n${safeUrl}`;
+                    if (canMobileShare) {
                         try {
-                            const fullMsg = `[${nameStr}]\n${safeUrl}`;
                             await navigator.share({ title: nameStr, text: fullMsg, url: safeUrl });
+                            return;
                         } catch (_) {}
-                    });
-                    normalControls.appendChild(shareBtn);
-                }
+                    }
+                    try {
+                        await navigator.clipboard.writeText(fullMsg);
+                        shareBtn.textContent = "✓";
+                        showToast(`💬 [${nameStr}] 카톡 붙여넣기(Ctrl+V)용 복사 완료!`);
+                        setTimeout(() => { shareBtn.textContent = "📤"; }, 1400);
+                    } catch (_) {
+                        prompt("아래 내용을 복사해 카카오톡에 붙여넣으세요:", fullMsg);
+                    }
+                });
+                normalControls.appendChild(shareBtn);
 
                 const copyBtn = document.createElement("button");
                 copyBtn.type = "button";
@@ -2020,15 +2030,15 @@
                 text: shareText,
                 url: shareUrl
             };
-            if (canNativeShare) {
+            if (canMobileShare) {
                 try {
                     await navigator.share(shareData);
                     return;
                 } catch (_) {}
             }
             try {
-                await navigator.clipboard.writeText(shareUrl);
-                showToast("💌 앱 주소가 복사되었습니다! 카톡에 붙여넣어 공유해보세요.");
+                await navigator.clipboard.writeText(`${shareTitle}\n${shareText}`);
+                showToast("💌 앱 추천 문구가 복사되었습니다! 카톡에 붙여넣어(Ctrl+V) 공유해보세요.");
             } catch (_) {
                 prompt("이 주소를 복사해 지인에게 전달해보세요:", shareUrl);
             }
